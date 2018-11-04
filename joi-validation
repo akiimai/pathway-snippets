@@ -1,0 +1,33 @@
+const Joi = require("joi"); 
+
+const schema = {
+    question: Joi.string()
+        .min(1)
+        .max(1000)
+        .required()
+    , helpText: Joi.string()
+        .min(1)
+        .max(1000)
+        .required()
+    , isRequired: Joi.boolean()
+        .required()
+    , userId: Joi.number()
+        .integer()
+        .required()
+    , isMultipleAllowed: Joi.boolean()
+        .required()
+    , questionTypeId: Joi.number()
+        .integer()
+        .required()
+    , sectionId: Joi.number()
+        .integer()
+        .required()
+    , statusId: Joi.number()
+        .integer()
+        .required()
+    , sortOrder: Joi.number()
+        .integer()
+        .required()
+}; 
+
+module.exports = Joi.object().keys(schema); 
