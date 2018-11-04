@@ -1,0 +1,50 @@
+    getChecklist() {
+        const templateId = process.env.REACT_APP_MAIN_ASSESSMENT_ID
+        const questionId = process.env.REACT_APP_SURVEY_QUESTION_ID
+        const userId = this.props.userProfiles.userId
+        const clientId = this.props.clientId
+
+        if (this.props.userChecklist) {
+            coachChecklistService.getByUserTemplateQuestionId(clientId, templateId, questionId)
+            .then(response => {
+                const clientId = response.items[0].userId
+                const checklistId = response.items[0].coachChecklistId
+                return coachObjectivesAchievementsService.readByClientId(clientId, checklistId)
+            })
+            .then(response => {
+                let obj = response.item
+                for (let i = 0; i < response.item.length; i++) {
+                    if (response.item[i].dateCreated !== null) {
+                        obj[i].isChecked = true;
+                    }
+                }
+                this.setState({
+                    data: obj,
+                    checklistId: obj[0].coachChecklistId
+                })
+            })
+            .catch(console.log)
+        }; 
+    }
+
+    onChange(event, index) {
+        if (this.state.data[index].completedCoachObjectives === null) {
+            let coachObjectivesId = this.state.data[index].coachObjectivesId
+            const data = {
+                coachObjectivesId: coachObjectivesId
+            }
+            coachObjectivesAchievementsService.post(data)
+                .then(response => {
+                    if (this.state.data[index].isChecked !== null) {
+                        let obj = JSON.parse(JSON.stringify(this.state.data))
+                        obj[index].isChecked = true;
+                        obj[index].date = new Date();
+
+                        this.setState({
+                            data: obj
+                        })
+                    }
+                })
+                .catch(console.log)
+        }; 
+    }
