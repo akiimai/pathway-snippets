@@ -1,0 +1,36 @@
+  componentDidMount() {
+    if (this.props.match.url === "/coach/client-list/") {
+      clientListService.readCoachesById()
+        .then(response => {
+          this.getClientListPercentage(response);
+        });
+    }; 
+  }
+
+  getClientListPercentage(response) {
+    let userData = response.items;
+    for (let i = 0; i < response.items.length; i++) {
+      const data = {
+        checklistId: response.items[i].checklistId,
+        userId: response.items[i].userId
+      };
+      coachObjectivesAchievementsService.readById(data)
+        .then(response => {
+          let completionPercentage = null;
+          let completedCoachObjectives = response && response.items.filter(item => item.completedCoachObjectives !== null);
+          if (completedCoachObjectives && completedCoachObjectives.length > 0) {
+            completionPercentage = (completedCoachObjectives.length / response.items.length) * 100;
+          } else {
+            completionPercentage = 0;
+          }
+          return completionPercentage;
+        })
+        .then(completionPercentage => {
+          userData[i].width = completionPercentage.toString() + "%";
+          console.log(userData[i].width);
+          this.setState({
+            data: userData
+          });
+        });
+    }; 
+  }
