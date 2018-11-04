@@ -1,0 +1,27 @@
+const mssql = require('../../mssql'); 
+const { TYPES } = require("tedious");
+
+const post = item => {
+  const promise = mssql.executeProc("Activities_Insert", sqlRequest => {
+      sqlRequest.addParameter("Detail", TYPES.NVarChar, item.detail, {
+        length: 500
+      });
+      sqlRequest.addParameter("ActivityTypeId", TYPES.Int, item.activityTypeId, {
+      });
+      sqlRequest.addParameter('UserId', TYPES.Int, item.userId);
+      sqlRequest.addOutputParameter("Id", TYPES.Int, null);
+    })
+    .then(response => {
+      return response.outputParameters.Id;
+    })
+    .catch(responseErrorHandler);
+  return promise;
+}
+
+const responseErrorHandler = error => {
+  console.log(error);
+  if (error && error.response && error.response.data && error.response.data.errors) {
+      console.error(error.response.data.errors);
+  }
+  return Promise.reject(error);
+}
