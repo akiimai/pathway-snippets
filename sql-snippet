@@ -1,0 +1,17 @@
+ALTER PROC [dbo].[SurveyAnswers_Select_ByUserTemplateQuestionId]
+
+@TemplateId int, 
+@QuestionId int, 
+@UserId int
+
+AS
+
+/*
+EXEC SurveyAnswers_Select_ByUserTemplateQuestionId @TemplateId = 404, @QuestionId = 443, @UserId = 167
+*/
+
+SELECT A.Id, A.UserId, A.InstanceId, A.QuestionId, A.AnswerOptionId, A.DateCreated, B.Id AS CoachChecklistId, C.SurveyTemplateId AS TemplateId
+FROM SurveyAnswers A
+LEFT JOIN CoachChecklist B ON A.AnswerOptionId = B.SurveyAnswerOptionId
+LEFT JOIN SurveyInstance C ON A.UserId = C.UserId
+WHERE SurveyTemplateId = @TemplateId AND QuestionId = @QuestionId AND A.User
