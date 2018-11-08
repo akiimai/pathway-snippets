@@ -1,0 +1,31 @@
+const sendGrid = require('@sendgrid/mail');
+
+function emailNotification(data) {
+  sendGrid.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: data.email,
+    from: 'no-reply@la-pathways.com',
+    subject: 'You received a message from LA Pathways',
+    text: 'You received a message from LA Pathways',
+    html: `<p>Hello,</p>`
+          + `<h4><strong>You received a message regarding ${data.description}</strong></h4>`
+          + `<p>Message: ${data.message}</p>`
+          + `<p>Click <a href='http://localhost:3000/data-management/userCoachChecklist'>here</a> to view your LA Pathways checklist</p>`
+  };
+  sendGrid.send(msg)
+    .then(responseSuccessHandler)
+    .catch(responseErrorHandler)
+}
+
+const responseSuccessHandler = response => {
+  console.log(response);
+  return response;
+};
+
+const responseErrorHandler = error => {
+  console.log(error);
+  if (error && error.response && error.response.data && error.response.data.errors) {
+    console.log(error.response.data.errors); 
+  }
+  return Promise.reject(error);
+};
